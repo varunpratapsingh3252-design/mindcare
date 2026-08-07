@@ -6,20 +6,15 @@ class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
   static User? get currentUser => _auth.currentUser;
-
-  static Future<void> register({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } on FirebaseAuthException catch (e) {
-      throw _getMessage(e);
-    }
-  }
+static Future<UserCredential> register({
+  required String email,
+  required String password,
+}) async {
+  return await _auth.createUserWithEmailAndPassword(
+    email: email,
+    password: password,
+  );
+}
 
   static Future<void> login({
     required String email,

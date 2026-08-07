@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'app.dart';
 import 'firebase_options.dart';
 
+import 'package:provider/provider.dart';
+
+import 'providers/mood_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -11,5 +14,14 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MindCareApp());
+  runApp(
+  MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (_) => MoodProvider(),
+      ),
+    ],
+    child: const MindCareApp(),
+  ),
+);
 }

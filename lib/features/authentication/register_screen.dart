@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_textfield.dart';
-
+import '../../models/user_model.dart';
+import '../../services/firestore_service.dart';
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -67,10 +68,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
         isLoading = true;
       });
 
-      await AuthService.register(
-        email: email,
-        password: password,
-      );
+      final credential = await AuthService.register(
+  email: email,
+  password: password,
+);
+
+final firebaseUser = credential.user;
+
+if (firebaseUser == null) {
+  throw Exception("User could not be created.");
+}
+
+final user = UserModel(
+  uid: firebaseUser.uid,
+  name: name,
+  email: email,
+);
+
+await FirestoreService.saveUser(user);
 
       if (!mounted) return;
 
