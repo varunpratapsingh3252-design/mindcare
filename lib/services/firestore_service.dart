@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../features/mood/models/mood_model.dart';
-import '../features/journal/models/journal_model.dart';
+import '../features/journal/models/journal_model.dart' as journal;
 import '../models/user_model.dart';
 
 class FirestoreService {
@@ -51,12 +51,12 @@ class FirestoreService {
   // JOURNALS
   // ===========================
 
-  static Future<void> saveJournal(JournalModel journal) async {
-    await _firestore
-        .collection('journals')
-        .doc(journal.id)
-        .set(journal.toMap());
-  }
+static Future<void> saveJournal(journal.JournalModel journalData) async {
+  await _firestore
+      .collection('journals')
+      .doc(journalData.id)
+      .set(journalData.toMap());
+}
 
   static Future<QuerySnapshot> getUserJournals(
       String userId) async {

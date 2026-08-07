@@ -6,7 +6,7 @@ import 'firebase_options.dart';
 
 import 'package:provider/provider.dart';
 
-import 'providers/mood_provider.dart';
+import 'features/mood/provider/mood_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
