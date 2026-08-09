@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../home/home_screen.dart';
-import 'register_screen.dart';
+
 import '../../core/widgets/custom_button.dart';
 import '../../core/widgets/custom_textfield.dart';
 import '../../services/auth_service.dart';
+
+import '../navigation/main_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,10 +13,9 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+
 class _LoginScreenState extends State<LoginScreen> {
-
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController passwordController = TextEditingController();
 
   bool isLoading = false;
@@ -26,48 +27,55 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-    Future<void> login() async {
-  String email = emailController.text.trim();
-  String password = passwordController.text.trim();
+  Future<void> login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-  if (email.isEmpty || password.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Please fill all fields"),
-      ),
-    );
-    return;
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill all fields"),
+        ),
+      );
+      return;
+    }
+
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      await AuthService.login(
+        email: email,
+        password: password,
+      );
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const MainScreen(),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
-  try {
-    setState(() {
-      isLoading = true;
-    });
-
-await AuthService.login(
-  email: email,
-  password: password,
-);
-
-Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(
-    builder: (_) => const HomeScreen(),
-  ),
-);
-  } catch (e) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(e.toString()),
-      backgroundColor: Colors.red,
-    ),
-  );
-} finally {
-    setState(() {
-      isLoading = false;
-    });
-  }
-}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,17 +132,22 @@ Navigator.pushReplacement(
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        // TODO: Forgot Password
+                      },
                       child: const Text("Forgot Password?"),
                     ),
                   ),
 
                   const SizedBox(height: 10),
 
-                  CustomButton(
-                    text: isLoading ? "Loading..." : "LOGIN",
-                   onPressed: login,
+                  SizedBox(
+                    width: double.infinity,
+                    child: CustomButton(
+                      text: isLoading ? "Loading..." : "LOGIN",
+                      onPressed: isLoading ? null : login,
                     ),
+                  ),
 
                   const SizedBox(height: 30),
 
@@ -142,7 +155,7 @@ Navigator.pushReplacement(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text("Don't have an account?"),
-                     TextButton(
+                      TextButton(
                         onPressed: () {
                           Navigator.push(
                             context,
@@ -154,7 +167,7 @@ Navigator.pushReplacement(
                         child: const Text("Register"),
                       ),
                     ],
-                  ),    
+                  ),
                 ],
               ),
             ),
